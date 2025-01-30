@@ -1,0 +1,410 @@
+use local
+switched to db local
+db.articles.insertMany([
+  { title: "MongoDB Basics", content: "MongoDB is a NoSQL database." },
+  { title: "Advanced MongoDB", content: "Learn indexing and aggregation in MongoDB." },
+  { title: "Database Performance", content: "Improve database performance with indexing." }
+]);
+{
+  acknowledged: true,
+  insertedIds: {
+    '0': ObjectId('6799f44850a9bc150649eb2c'),
+    '1': ObjectId('6799f44850a9bc150649eb2d'),
+    '2': ObjectId('6799f44850a9bc150649eb2e')
+  }
+}
+db.articles.createIndex({ title: "text", content: "text" });
+title_text_content_text
+//find
+
+db.articles.find({ $text: { $search: "indexing" } });
+{
+  _id: ObjectId('6799f44850a9bc150649eb2e'),
+  title: 'Database Performance',
+  content: 'Improve database performance with indexing.'
+}
+{
+  _id: ObjectId('6799f44850a9bc150649eb2d'),
+  title: 'Advanced MongoDB',
+  content: 'Learn indexing and aggregation in MongoDB.'
+}
+{
+  _id: ObjectId('6799f3a7a6edca6bc2d927dc'),
+  title: 'Database Performance',
+  content: 'Improve database performance with indexing.'
+}
+{
+  _id: ObjectId('6799f3a7a6edca6bc2d927db'),
+  title: 'Advanced MongoDB',
+  content: 'Learn indexing and aggregation in MongoDB.'
+}
+{
+  _id: ObjectId('6799f32d378ac7eb9354c19e'),
+  title: 'Database Performance',
+  content: 'Improve database performance with indexing.'
+}
+{
+  _id: ObjectId('6799f32d378ac7eb9354c19d'),
+  title: 'Advanced MongoDB',
+  content: 'Learn indexing and aggregation in MongoDB.'
+}
+db.articles.find({ $text: { $search: "\"database performance\"" } });
+{
+  _id: ObjectId('6799f44850a9bc150649eb2e'),
+  title: 'Database Performance',
+  content: 'Improve database performance with indexing.'
+}
+{
+  _id: ObjectId('6799f3a7a6edca6bc2d927dc'),
+  title: 'Database Performance',
+  content: 'Improve database performance with indexing.'
+}
+{
+  _id: ObjectId('6799f32d378ac7eb9354c19e'),
+  title: 'Database Performance',
+  content: 'Improve database performance with indexing.'
+}
+db.articles.find(
+  { $text: { $search: "database" } },
+  { score: { $meta: "textScore" } }
+).sort({ score: { $meta: "textScore" } });
+{
+  _id: ObjectId('6799f44850a9bc150649eb2e'),
+  title: 'Database Performance',
+  content: 'Improve database performance with indexing.',
+  score: 1.375
+}
+{
+  _id: ObjectId('6799f3a7a6edca6bc2d927dc'),
+  title: 'Database Performance',
+  content: 'Improve database performance with indexing.',
+  score: 1.375
+}
+{
+  _id: ObjectId('6799f32d378ac7eb9354c19e'),
+  title: 'Database Performance',
+  content: 'Improve database performance with indexing.',
+  score: 1.375
+}
+{
+  _id: ObjectId('6799f44850a9bc150649eb2c'),
+  title: 'MongoDB Basics',
+  content: 'MongoDB is a NoSQL database.',
+  score: 0.6666666666666666
+}
+{
+  _id: ObjectId('6799f3a7a6edca6bc2d927da'),
+  title: 'MongoDB Basics',
+  content: 'MongoDB is a NoSQL database.',
+  score: 0.6666666666666666
+}
+{
+  _id: ObjectId('6799f32d378ac7eb9354c19c'),
+  title: 'MongoDB Basics',
+  content: 'MongoDB is a NoSQL database.',
+  score: 0.6666666666666666
+}
+db.articles.find({ title: { $regex: "^MongoDB", $options: "i" } });
+{
+  _id: ObjectId('6799f32d378ac7eb9354c19c'),
+  title: 'MongoDB Basics',
+  content: 'MongoDB is a NoSQL database.'
+}
+{
+  _id: ObjectId('6799f3a7a6edca6bc2d927da'),
+  title: 'MongoDB Basics',
+  content: 'MongoDB is a NoSQL database.'
+}
+{
+  _id: ObjectId('6799f44850a9bc150649eb2c'),
+  title: 'MongoDB Basics',
+  content: 'MongoDB is a NoSQL database.'
+}
+db.articles.aggregate([
+  {
+    $project: {
+      combinedText: { $concat: ["$title", " - ", "$content"] }
+    }
+  }
+]);
+{
+  _id: ObjectId('6799f32d378ac7eb9354c19c'),
+  combinedText: 'MongoDB Basics - MongoDB is a NoSQL database.'
+}
+{
+  _id: ObjectId('6799f32d378ac7eb9354c19d'),
+  combinedText: 'Advanced MongoDB - Learn indexing and aggregation in MongoDB.'
+}
+{
+  _id: ObjectId('6799f32d378ac7eb9354c19e'),
+  combinedText: 'Database Performance - Improve database performance with indexing.'
+}
+{
+  _id: ObjectId('6799f3a7a6edca6bc2d927da'),
+  combinedText: 'MongoDB Basics - MongoDB is a NoSQL database.'
+}
+{
+  _id: ObjectId('6799f3a7a6edca6bc2d927db'),
+  combinedText: 'Advanced MongoDB - Learn indexing and aggregation in MongoDB.'
+}
+{
+  _id: ObjectId('6799f3a7a6edca6bc2d927dc'),
+  combinedText: 'Database Performance - Improve database performance with indexing.'
+}
+{
+  _id: ObjectId('6799f44850a9bc150649eb2c'),
+  combinedText: 'MongoDB Basics - MongoDB is a NoSQL database.'
+}
+{
+  _id: ObjectId('6799f44850a9bc150649eb2d'),
+  combinedText: 'Advanced MongoDB - Learn indexing and aggregation in MongoDB.'
+}
+{
+  _id: ObjectId('6799f44850a9bc150649eb2e'),
+  combinedText: 'Database Performance - Improve database performance with indexing.'
+}
+db.articles.aggregate([
+  {
+    $project: {
+      substringExample: { $substr: ["$content", 0, 15] } // First 15 characters
+    }
+  }
+]);
+{
+  _id: ObjectId('6799f32d378ac7eb9354c19c'),
+  substringExample: 'MongoDB is a No'
+}
+{
+  _id: ObjectId('6799f32d378ac7eb9354c19d'),
+  substringExample: 'Learn indexing '
+}
+{
+  _id: ObjectId('6799f32d378ac7eb9354c19e'),
+  substringExample: 'Improve databas'
+}
+{
+  _id: ObjectId('6799f3a7a6edca6bc2d927da'),
+  substringExample: 'MongoDB is a No'
+}
+{
+  _id: ObjectId('6799f3a7a6edca6bc2d927db'),
+  substringExample: 'Learn indexing '
+}
+{
+  _id: ObjectId('6799f3a7a6edca6bc2d927dc'),
+  substringExample: 'Improve databas'
+}
+{
+  _id: ObjectId('6799f44850a9bc150649eb2c'),
+  substringExample: 'MongoDB is a No'
+}
+{
+  _id: ObjectId('6799f44850a9bc150649eb2d'),
+  substringExample: 'Learn indexing '
+}
+{
+  _id: ObjectId('6799f44850a9bc150649eb2e'),
+  substringExample: 'Improve databas'
+}
+// Split a String:
+
+
+
+
+db.articles.aggregate([
+  {
+    $project: {
+      splitExample: { $split: ["$content", " "] } // Split by spaces
+    }
+  }
+]);
+{
+  _id: ObjectId('6799f32d378ac7eb9354c19c'),
+  splitExample: [
+    'MongoDB',
+    'is',
+    'a',
+    'NoSQL',
+    'database.'
+  ]
+}
+{
+  _id: ObjectId('6799f32d378ac7eb9354c19d'),
+  splitExample: [
+    'Learn',
+    'indexing',
+    'and',
+    'aggregation',
+    'in',
+    'MongoDB.'
+  ]
+}
+{
+  _id: ObjectId('6799f32d378ac7eb9354c19e'),
+  splitExample: [
+    'Improve',
+    'database',
+    'performance',
+    'with',
+    'indexing.'
+  ]
+}
+{
+  _id: ObjectId('6799f3a7a6edca6bc2d927da'),
+  splitExample: [
+    'MongoDB',
+    'is',
+    'a',
+    'NoSQL',
+    'database.'
+  ]
+}
+{
+  _id: ObjectId('6799f3a7a6edca6bc2d927db'),
+  splitExample: [
+    'Learn',
+    'indexing',
+    'and',
+    'aggregation',
+    'in',
+    'MongoDB.'
+  ]
+}
+{
+  _id: ObjectId('6799f3a7a6edca6bc2d927dc'),
+  splitExample: [
+    'Improve',
+    'database',
+    'performance',
+    'with',
+    'indexing.'
+  ]
+}
+{
+  _id: ObjectId('6799f44850a9bc150649eb2c'),
+  splitExample: [
+    'MongoDB',
+    'is',
+    'a',
+    'NoSQL',
+    'database.'
+  ]
+}
+{
+  _id: ObjectId('6799f44850a9bc150649eb2d'),
+  splitExample: [
+    'Learn',
+    'indexing',
+    'and',
+    'aggregation',
+    'in',
+    'MongoDB.'
+  ]
+}
+{
+  _id: ObjectId('6799f44850a9bc150649eb2e'),
+  splitExample: [
+    'Improve',
+    'database',
+    'performance',
+    'with',
+    'indexing.'
+  ]
+}
+// Convert Text to Lowercase:
+
+db.articles.aggregate([
+  {
+    $project: {
+      lowercaseContent: { $toLower: "$content" }
+    }
+  }
+]);
+{
+  _id: ObjectId('6799f32d378ac7eb9354c19c'),
+  lowercaseContent: 'mongodb is a nosql database.'
+}
+{
+  _id: ObjectId('6799f32d378ac7eb9354c19d'),
+  lowercaseContent: 'learn indexing and aggregation in mongodb.'
+}
+{
+  _id: ObjectId('6799f32d378ac7eb9354c19e'),
+  lowercaseContent: 'improve database performance with indexing.'
+}
+{
+  _id: ObjectId('6799f3a7a6edca6bc2d927da'),
+  lowercaseContent: 'mongodb is a nosql database.'
+}
+{
+  _id: ObjectId('6799f3a7a6edca6bc2d927db'),
+  lowercaseContent: 'learn indexing and aggregation in mongodb.'
+}
+{
+  _id: ObjectId('6799f3a7a6edca6bc2d927dc'),
+  lowercaseContent: 'improve database performance with indexing.'
+}
+{
+  _id: ObjectId('6799f44850a9bc150649eb2c'),
+  lowercaseContent: 'mongodb is a nosql database.'
+}
+{
+  _id: ObjectId('6799f44850a9bc150649eb2d'),
+  lowercaseContent: 'learn indexing and aggregation in mongodb.'
+}
+{
+  _id: ObjectId('6799f44850a9bc150649eb2e'),
+  lowercaseContent: 'improve database performance with indexing.'
+}
+//  Add Data with Different Languages
+db.notes.insertMany([
+  { text: "El sol brilla intensamente.", language: "es" },
+  { text: "The sun shines brightly.", language: "en" },
+  { text: "Le soleil brille intensément.", language: "fr" }
+]);
+{
+  acknowledged: true,
+  insertedIds: {
+    '0': ObjectId('6799f53d50a9bc150649eb2f'),
+    '1': ObjectId('6799f53d50a9bc150649eb30'),
+    '2': ObjectId('6799f53d50a9bc150649eb31')
+  }
+}
+ // Create a Text Index with Default Language
+db.notes.createIndex({ text: "text" }, { default_language: "spanish" });
+text_text
+ // Perform a Search in Spanish
+db.notes.find({ $text: { $search: "brilla" } });
+{
+  _id: ObjectId('6799f53d50a9bc150649eb31'),
+  text: 'Le soleil brille intensément.',
+  language: 'fr'
+}
+{
+  _id: ObjectId('6799f53d50a9bc150649eb2f'),
+  text: 'El sol brilla intensamente.',
+  language: 'es'
+}
+// Add Data
+db.blogs.insertMany([
+  { title: "MongoDB Features", summary: "Learn how to use MongoDB features." },
+  { title: "Database Performance Tips", summary: "Tips to improve database performance." }
+]);
+{
+  acknowledged: true,
+  insertedIds: {
+    '0': ObjectId('6799f5a450a9bc150649eb32'),
+    '1': ObjectId('6799f5a450a9bc150649eb33')
+  }
+}
+// Create a Weighted Text Index
+db.blogs.createIndex(
+  { title: "text", summary: "text" },
+  { weights: { title: 10, summary: 5 } }
+);
+title_text_summary_text
+// Perform a Weighted Search
+db.blogs.find(
+  { $text: { $search: "performance" } },
+  { score: { $meta: "textScore" } }
+).sort({ score: { $meta: "textScore" } });

@@ -1,0 +1,29 @@
+body {
+    font-family: 'Inter', sans-serif;
+}
+
+#quiz-container {
+    width: 100%;
+    max-width: 600px;
+}
+
+.question-box {
+    background-color: #f9f9f9;
+    transition: transform 0.2s ease-in-out;
+}
+
+.question-box:hover {
+    transform: scale(1.02);
+}
+
+input[type="radio"] {
+    margin-right: 10px;
+}
+
+button {
+    transition: background-color 0.2s ease-in-out;
+}
+
+button:hover {
+    background-color: #2563eb;
+}
